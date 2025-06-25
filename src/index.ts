@@ -1,9 +1,23 @@
-import { clean, major, rcompare, valid } from "semver";
+import { clean, rcompare, satisfies } from "semver";
 
 // const TOKEN = process.env.GITHUB_TOKEN;
 
 // For now, we're targetting major version 0
-const TAG_MAJOR_VERSION = 0;
+const TAG_MAJOR_VERSION = 3;
+
+const getLatestMinorVersion = (
+  rawTags: string[],
+  majorVersion: number,
+): string | undefined => {
+  return rawTags
+    .map((tag) => clean(tag))
+    .filter(
+      (tag): tag is string =>
+        !!tag &&
+        satisfies(tag, `>=${majorVersion}.0.0 <${majorVersion + 1}.0.0`),
+    )
+    .sort(rcompare)[0];
+};
 
 export const getLatestTag = async (): Promise<string> => {
   try {
@@ -20,11 +34,9 @@ export const getLatestTag = async (): Promise<string> => {
     );
 
     const tagsResponse = await response.json();
+    const rawTags = tagsResponse.map((r: any) => r.name);
 
-    const latestMinor: string = tagsResponse
-      .map((r: any) => clean(r.name))
-      .filter((tag: string) => valid(tag) && major(tag) === TAG_MAJOR_VERSION)
-      .sort(rcompare)[0];
+    const latestMinor = getLatestMinorVersion(rawTags, TAG_MAJOR_VERSION);
 
     if (!latestMinor) {
       console.error(`No valid tag found for this version!`, {
