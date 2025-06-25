@@ -18,7 +18,7 @@ export const getLatestTag = async (): Promise<string> => {
 
     const tags = await response.json();
 
-    console.log("Releases:\n", tags);
+    console.log("Tags:\n", tags);
 
     const latest_v0 = tags
       .map((r: any) => r.name)
