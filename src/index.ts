@@ -19,26 +19,30 @@ export const getLatestTag = async (): Promise<string> => {
       },
     );
 
-    const tags = await response.json();
+      const tagsResponse = await response.json();
 
-    console.log("Tags:\n", tags);
+      const latestMinor: string = tagsResponse
+        .map((r: any) => r.name)
+        .map((tag: string) => (tag.startsWith('v') ? tag.slice(1) : tag))
+        .filter((tag: string) => valid(tag) && major(tag) === TAG_MAJOR_VERSION)
+        .sort(rcompare)[0];
 
-    const latest_v0 = tags
-      .map((r: any) => r.name)
-      .map((tag: string) => (tag.startsWith("v") ? tag.slice(1) : tag))
-      .filter((tag: string) => valid(tag) && major(tag) === TAG_MAJOR_VERSION)
-      .sort(rcompare)[0];
+      if (!latestMinor) {
+        console.error(`No valid tag found for this version!`, {
+          majorVersion: TAG_MAJOR_VERSION,
+        });
+        throw new Error(`No valid v${TAG_MAJOR_VERSION}.x.x release found!`);
+      }
 
-    if (!latest_v0) {
-      throw new Error("No valid v0.x.x release found!");
+      console.log(`Using the latest tag: ${latestMinor}`);
+
+      return latestMinor;
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to fetch tag!');
     }
-
-    return latest_v0;
-  } catch (err) {
-    console.error(err);
-    throw new Error("Failed to fetch/parse tags");
   }
-};
 
 const tag = await getLatestTag();
+
 console.log("FINAL TAG VALUE: ", tag);
