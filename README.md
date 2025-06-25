@@ -2,7 +2,7 @@
 
 ## Setup
 Install dependencies and run the app
-```bash
+```console
 pnpm install
 
 pnpm run dev
