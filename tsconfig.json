@@ -1,20 +1,26 @@
-// tsconfig.json
 {
   "compilerOptions": {
-    "target": "es2022",           /* Specify ECMAScript target version. */
-    "module": "nodenext",         /* Specify module code generation strategy. This enables top-level await. */
-    "lib": ["es2022", "dom"],     /* Include DOM lib if you're fetching in Node.js (for global `fetch` types) */
-    "esModuleInterop": true,      /* Enable compatibility for CommonJS imports in ES Modules. */
-    "forceConsistentCasingInFileNames": true, /* Ensure consistent file casing. */
-    "strict": true,               /* Enable all strict type-checking options. */
-    "skipLibCheck": true,         /* Skip type checking all .d.ts files. */
-    "outDir": "./dist",           /* Where to output compiled JS files. */
-    "rootDir": "./src"            /* Your source directory. */
-  },
-  "include": [
-    "src/**/*.ts"                 /* Include all TypeScript files in the src directory. */
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "module": "esnext",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "jsx": "react",
+    // "noImplicitAny": true
+    // "strictPropertyInitialization": true,
+  }
 }
