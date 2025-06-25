@@ -1,4 +1,4 @@
-import { major, rcompare, valid } from "semver";
+import { clean, major, rcompare, valid } from "semver";
 
 // const TOKEN = process.env.GITHUB_TOKEN;
 
@@ -19,29 +19,30 @@ export const getLatestTag = async (): Promise<string> => {
       },
     );
 
-      const tagsResponse = await response.json();
+    const tagsResponse = await response.json();
 
-      const latestMinor: string = tagsResponse
-        .map((r: any) => r.name)
-        .map((tag: string) => (tag.startsWith('v') ? tag.slice(1) : tag))
-        .filter((tag: string) => valid(tag) && major(tag) === TAG_MAJOR_VERSION)
-        .sort(rcompare)[0];
+    const latestMinor: string = tagsResponse
+      .map((r: any) => clean(r.name))
+      .filter((tag: string) => valid(tag) && major(tag) === TAG_MAJOR_VERSION)
+      .sort(rcompare)[0];
 
-      if (!latestMinor) {
-        console.error(`No valid tag found for this version!`, {
-          majorVersion: TAG_MAJOR_VERSION,
-        });
-        throw new Error(`No valid v${TAG_MAJOR_VERSION}.x.x release found!`);
-      }
-
-      console.log(`Using the latest tag for the major version = ${TAG_MAJOR_VERSION}: ${latestMinor}`);
-
-      return latestMinor;
-    } catch (err) {
-      console.error(err);
-      throw new Error('Failed to fetch tag!');
+    if (!latestMinor) {
+      console.error(`No valid tag found for this version!`, {
+        majorVersion: TAG_MAJOR_VERSION,
+      });
+      throw new Error(`No valid v${TAG_MAJOR_VERSION}.x.x release found!`);
     }
+
+    console.log(
+      `Using the latest tag for the major version = ${TAG_MAJOR_VERSION}: ${latestMinor}`,
+    );
+
+    return latestMinor;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Failed to fetch tag!");
   }
+};
 
 const tag = await getLatestTag();
 
