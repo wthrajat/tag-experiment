@@ -34,7 +34,7 @@ export const getLatestTag = async (): Promise<string> => {
         throw new Error(`No valid v${TAG_MAJOR_VERSION}.x.x release found!`);
       }
 
-      console.log(`Using the latest tag: ${latestMinor}`);
+      console.log(`Using the latest tag for the major version = ${TAG_MAJOR_VERSION}: ${latestMinor}`);
 
       return latestMinor;
     } catch (err) {
