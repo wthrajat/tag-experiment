@@ -39,9 +39,9 @@ jobs:
     steps:
       - name: Show all check_approvals outputs
         run: |
-          echo "Needs context: ${{ toJSON(needs.check_approvals.outputs) }}"
+          echo "Needs context: ${{ jobs.check_approvals.outputs.approval-status) }}"
           echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
-          echo "Full job context: ${{ job }}"
+          echo "Full job context: ${{ jobs }}"
 
   main_build:
     needs: check_approvals
