@@ -1,11 +1,3 @@
-name: Approval Test Workflow
-
-on:
-  workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
-
 jobs:
   check_approvals:
     if: github.event_name == 'workflow_dispatch'
@@ -13,8 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-    outputs:
-      approval-status: ${{ steps.approval.outputs.approved }}
     steps:
       - name: Require manual approval
         id: approval
@@ -27,39 +17,21 @@ jobs:
           issue-title: 'Manual build approval'
           issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
-          
-      - name: Show approval outputs
-        run: |
-          echo "Approval output (approval-status): ${{ steps.approval.outputs.approval-status }}"
-          echo "Approval output (whole output): ${{ steps.approval.outputs }}"
 
   debug_outputs:
     needs: check_approvals
     runs-on: ubuntu-latest
     steps:
-      - name: Show all check_approvals outputs
+      - name: Show check_approvals result
         run: |
-          echo "Approval status: ${{ needs.check_approvals.steps.approval.outputs.approval-status }}"
-          echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
+          echo "check_approvals result: ${{ needs.check_approvals.result }}"
 
   main_build:
     needs: check_approvals
     if: |
-      (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'approved') ||
+      (github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success') ||
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     steps:
-      - name: Show build trigger info
-        run: |
-          echo "=== BUILD TRIGGER INFO ==="
-          echo "Event: ${{ github.event_name }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Approval Status: ${{ needs.check_approvals.outputs.approval-status || 'N/A (tag push)' }}"
-          echo "All needs outputs: ${{ toJSON(needs) }}"
-          echo "Job context: ${{ toJSON(job) }}"
-          echo "Workflow context: ${{ toJSON(github) }}"
-          
-      - name: Simulate build steps
-        run: echo "BUILD SIMULATION COMPLETE"
-
-        
+      - name: Simulate build
+        run: echo "BUILD RUNNING"
