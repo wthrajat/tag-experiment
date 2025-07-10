@@ -1,4 +1,4 @@
-name: Build Test Workflow
+name: Approval Test Workflow
 
 on:
   workflow_dispatch:
@@ -14,46 +14,60 @@ jobs:
     permissions:
       issues: write
     outputs:
-      approved: ${{ steps.approval.outputs.approved }}
+      approval-status: ${{ steps.approval.outputs.approved }}
     steps:
+      - name: Debug initial context
+        run: |
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+          
       - name: Require manual approval
         id: approval
         uses: trstringer/manual-approval@v1
         timeout-minutes: 60
         with:
-          secret: ${{ github.TOKEN }}
+          secret: ${{ secrets.GITHUB_TOKEN }}
           approvers: wthrajat,vaibhav-init
           minimum-approvals: 1
           issue-title: 'Manual build approval'
           issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
+          
+      - name: Show approval outputs
+        run: |
+          echo "Approval output (approved): ${{ steps.approval.outputs.approved }}"
+          echo "Approval output (status): ${{ steps.approval.outputs.status }}"
+          echo "Approval output (comment-id): ${{ steps.approval.outputs.comment-id }}"
+
+  debug_outputs:
+    needs: check_approvals
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show all check_approvals outputs
+        run: |
+          echo "Needs context: ${{ toJSON(needs) }}"
+          echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
+          echo "Full job context: ${{ toJSON(job) }}"
 
   main_build:
     needs: check_approvals
-    run: echo "check_approvals output = ${{ needs.check_approvals.outputs }}"
-
     if: |
-      (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'approved') ||
+      (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'true') ||
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
-
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Simulate submodule download
-        run: echo "This would download submodules in real workflow"
-
-      - name: Simulate AWS config
-        run: echo "This would configure AWS credentials in real workflow"
-
-      - name: Simulate Docker build
+      - name: Show build trigger info
         run: |
-          echo "Simulating Docker build with tags:"
-          echo "Version tag: v1.0.0"
-          echo "Major.Minor tag: v1.0"
-          echo "Major tag: v1"
-          echo "SHA tag: abc123"
+          echo "=== BUILD TRIGGER INFO ==="
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Approval Status: ${{ needs.check_approvals.outputs.approval-status || 'N/A (tag push)' }}"
+          echo "All needs outputs: ${{ toJSON(needs) }}"
+          echo "Job context: ${{ toJSON(job) }}"
+          echo "Workflow context: ${{ toJSON(github) }}"
+          
+      - name: Simulate build steps
+        run: echo "BUILD SIMULATION COMPLETE"
 
-      - name: Show build success
-        run: echo "BUILD SUCCESSFUL! Triggered by = ${{ github.event_name }}"
+        
