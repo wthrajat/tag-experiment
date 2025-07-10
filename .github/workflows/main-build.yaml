@@ -24,8 +24,8 @@ jobs:
           secret: ${{ github.TOKEN }}
           approvers: wthrajat,vaibhav-init
           minimum-approvals: 1
-          issue-title: 'Test build approval'
-          issue-body: 'Please approve or deny this test build'
+          issue-title: 'Manual build approval'
+          issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
 
   main_build:
