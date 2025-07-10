@@ -1,0 +1,54 @@
+name: Build Test Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  check_approvals:
+    if: github.event_name == 'workflow_dispatch'
+    name: Wait for Approvals
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    outputs:
+      approved: ${{ steps.approval.outputs.approved }}
+    steps:
+      - name: Require manual approval
+        id: approval
+        uses: trstringer/manual-approval@v1
+        timeout-minutes: 60
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: wthrajat  # Replace with your username
+          minimum-approvals: 1
+          issue-title: 'Test build approval'
+          issue-body: 'Please approve or deny this test build'
+          exclude-workflow-initiator-as-approver: true
+
+  main_build:
+    needs: check_approvals
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Simulate submodule download
+        run: echo "This would download submodules in real workflow"
+
+      - name: Simulate AWS config
+        run: echo "This would configure AWS credentials in real workflow"
+
+      - name: Simulate Docker build
+        run: |
+          echo "Simulating Docker build with tags:"
+          echo "Version tag: v1.0.0"
+          echo "Major.Minor tag: v1.0"
+          echo "Major tag: v1"
+          echo "SHA tag: abc123"
+
+      - name: Show build success
+        run: echo "BUILD SUCCESSFUL! Triggered by: ${{ github.event_name }}"
