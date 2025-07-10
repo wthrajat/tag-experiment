@@ -51,4 +51,4 @@ jobs:
           echo "SHA tag: abc123"
 
       - name: Show build success
-        run: echo "BUILD SUCCESSFUL! Triggered by: ${{ github.event_name }}"
+        run: echo "BUILD SUCCESSFUL! Triggered by = ${{ github.event_name }}"
