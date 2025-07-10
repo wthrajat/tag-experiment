@@ -30,6 +30,7 @@ jobs:
 
   main_build:
     needs: check_approvals
+    run: echo "check_approvals output = ${{ needs.check_approvals.outputs }}"
 
     if: |
       (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'approved') ||
