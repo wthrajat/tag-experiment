@@ -16,12 +16,6 @@ jobs:
     outputs:
       approval-status: ${{ steps.approval.outputs.approved }}
     steps:
-      - name: Debug initial context
-        run: |
-          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
-          echo "GITHUB_REF: $GITHUB_REF"
-          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
-          
       - name: Require manual approval
         id: approval
         uses: trstringer/manual-approval@v1
@@ -36,9 +30,8 @@ jobs:
           
       - name: Show approval outputs
         run: |
-          echo "Approval output (approved): ${{ steps.approval.outputs.approved }}"
-          echo "Approval output (status): ${{ steps.approval.outputs.status }}"
-          echo "Approval output (comment-id): ${{ steps.approval.outputs.comment-id }}"
+          echo "Approval output (approval-status): ${{ steps.approval.outputs.approval-status }}"
+          echo "Approval output (whole output): ${{ steps.approval.outputs }}"
 
   debug_outputs:
     needs: check_approvals
@@ -46,9 +39,9 @@ jobs:
     steps:
       - name: Show all check_approvals outputs
         run: |
-          echo "Needs context: ${{ toJSON(needs) }}"
+          echo "Needs context: ${{ needs.check_approvals }}"
           echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
-          echo "Full job context: ${{ toJSON(job) }}"
+          echo "Full job context: ${{ job }}"
 
   main_build:
     needs: check_approvals
