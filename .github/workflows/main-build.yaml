@@ -46,7 +46,7 @@ jobs:
   main_build:
     needs: check_approvals
     if: |
-      (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'true') ||
+      (github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approval-status == 'approved') ||
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     steps:
