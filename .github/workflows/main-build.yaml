@@ -40,6 +40,7 @@ jobs:
       - name: Show all check_approvals outputs
         run: |
           echo "Approval status: ${{ needs.check_approvals.steps.approval.outputs.approval-status }}"
+          echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
 
   main_build:
     needs: check_approvals
