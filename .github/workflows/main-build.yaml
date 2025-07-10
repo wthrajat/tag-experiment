@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Show all check_approvals outputs
         run: |
-          echo "Needs context: ${{ needs.check_approvals }}"
+          echo "Needs context: ${{ needs.check_approvals.outputs }}"
           echo "Approval status: ${{ needs.check_approvals.outputs.approval-status }}"
           echo "Full job context: ${{ job }}"
 
