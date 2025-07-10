@@ -22,7 +22,7 @@ jobs:
         timeout-minutes: 60
         with:
           secret: ${{ github.TOKEN }}
-          approvers: wthrajat  # Replace with your username
+          approvers: wthrajat,vaibhav-init
           minimum-approvals: 1
           issue-title: 'Test build approval'
           issue-body: 'Please approve or deny this test build'
