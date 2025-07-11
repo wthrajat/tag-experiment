@@ -8,8 +8,7 @@ on:
 
 jobs:
   check_approvals:
-    if: |
-      (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) 
+    if: github.event_name == 'workflow_dispatch'
     name: Wait for Approvals
     runs-on: ubuntu-latest
     permissions:
@@ -27,20 +26,13 @@ jobs:
           issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
 
-  debug_outputs:
-    needs: check_approvals
-    runs-on: ubuntu-latest
-    steps:
-      - name: Show check_approvals result
-        run: |
-          echo "check_approvals result: ${{ needs.check_approvals.result }}"
-
   main_build:
     needs: check_approvals
     if: |
-      (github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success') ||
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - name: Simulate build
-        run: echo "BUILD RUNNING"
+        run: echo "🚀 BUILD RUNNING"
+
