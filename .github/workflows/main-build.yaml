@@ -1,9 +1,10 @@
-name: Build job
+name: Approval + Tag Build
 
 on:
   workflow_dispatch:
   push:
-
+    tags:
+      - 'v*'
 
 jobs:
   check_approvals:
@@ -31,28 +32,5 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Decide whether to build
-        id: decision
-        run: |
-          echo "event: ${{ github.event_name }}"
-          echo "ref: ${{ github.ref }}"
-          echo "approved: ${{ needs.check_approvals.outputs.approved }}"
-          
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "Proceeding: tag push"
-            echo "proceed=true" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ needs.check_approvals.outputs.approved }}" == "true" ]]; then
-            echo "Proceeding: manual approved"
-            echo "proceed=true" >> $GITHUB_OUTPUT
-          else
-            echo "Not approved, skipping build"
-            echo "proceed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Run build if allowed
-        if: steps.decision.outputs.proceed == 'true'
-        run: echo "🚀 Running build!"
-
-      - name: Skip build message
-        if: steps.decision.outputs.proceed != 'true'
-        run: echo "❌ Build skipped — not approved or unexpected trigger"
+      - name: Run build
+        run: echo "🚀 BUILD RUNNING"
