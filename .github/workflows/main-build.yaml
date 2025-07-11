@@ -39,7 +39,6 @@ jobs:
         run: echo "🚀 BUILD RUNNING"
 
       - name: ❌ Skipping build due to denial
-        run: Value of result => ${{ needs.check_approvals.result }}
         if: |
           github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'failure'
         run: echo "🛑 Build was denied by approvers"
