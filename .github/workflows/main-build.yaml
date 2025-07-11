@@ -39,4 +39,8 @@ jobs:
       - name: ❌ Skipping build due to denial
         if: |
           github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'failure'
-        run: echo "🛑 Build was denied by approvers"
+        run: |
+          echo "🛑 Build was denied by approvers! Exiting..."
+          exit 1
+      - name: So far ahead
+        run: echo "We are in so far ahead!!! 🚀🚀🚀🚀🚀"
