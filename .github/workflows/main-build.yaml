@@ -1,4 +1,4 @@
-name: Approval Test Workflow
+name: Unified Approval & Tag Build
 
 on:
   workflow_dispatch:
@@ -9,7 +9,6 @@ on:
 jobs:
   check_approvals:
     if: github.event_name == 'workflow_dispatch'
-    name: Wait for Approvals
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -28,17 +27,30 @@ jobs:
           issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
 
-  build_manual:
-    needs: check_approvals
-    if: github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success'
+  dispatch_build:
     runs-on: ubuntu-latest
+    outputs:
+      run_build: ${{ steps.set.outputs.run_build }}
+    needs: [check_approvals]
+    if: |
+      github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approved == 'true'
     steps:
-      - name: Manual build
-        run: echo "🚀 BUILD after manual approval"
+      - id: set
+        run: echo "run_build=true" >> "$GITHUB_OUTPUT"
 
-  build_tag:
+  skip_dispatch_build:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    outputs:
+      run_build: true
     steps:
-      - name: Tag build
-        run: echo "🏷️ BUILD for tag push"
+      - run: echo "Skipping manual approval for tag push"
+
+  build:
+    needs: [dispatch_build, skip_dispatch_build]
+    if: |
+      needs.dispatch_build.outputs.run_build == 'true' || needs.skip_dispatch_build.outputs.run_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Real Build Starts Here
+        run: echo "🚀 Building now (trigger => ${{ github.event_name }})"
