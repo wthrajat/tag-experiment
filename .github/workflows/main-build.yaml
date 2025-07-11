@@ -32,5 +32,13 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Run build
+      - name: 🚥 Check if build should run
+        if: |
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) ||
+          (github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success')
         run: echo "🚀 BUILD RUNNING"
+
+      - name: ❌ Skipping build due to denial
+        if: |
+          github.event_name == 'workflow_dispatch' && needs.check_approvals.result != 'success'
+        run: echo "🛑 Build was denied by approvers"
