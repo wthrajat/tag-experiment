@@ -1,4 +1,4 @@
-name: Unified Approval + Tag Build
+name: Build job
 
 on:
   workflow_dispatch:
