@@ -30,17 +30,21 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: 🚥 Check if build should run depending on request was accepted or denied
-        if: |
-          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
-          (github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success')
-        run: echo "🚀 BUILD RUNNING"
-
-      - name: ❌ Skipping build due to denial
-        if: |
-          github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'failure'
+      - name: 🔄 Evaluating whether to run build, based on approval or tag push
         run: |
-          echo "🛑 Build was denied by approvers! Exiting..."
-          exit 1
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ needs.check_approvals.result }}" == "failure" ]]; then
+            echo "🛑 Build denied by approvers! Exiting..."
+            exit 1
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ needs.check_approvals.result }}" == "success" ]]; then
+            echo "✅ Approved by approvers. Proceeding with build..."
+          fi
+
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "🏷️ Tag push detected. Proceeding with build..."
+          fi
+
+
       - name: So far ahead
         run: echo "We are in so far ahead!!! 🚀🚀🚀🚀🚀"
