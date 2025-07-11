@@ -30,7 +30,7 @@ jobs:
 
   build_manual:
     needs: check_approvals
-    if: github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approved == 'true'
+    if: github.event_name == 'workflow_dispatch' && needs.check_approvals.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Manual build
