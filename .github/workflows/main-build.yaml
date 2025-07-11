@@ -1,4 +1,4 @@
-name: Unified Approval & Tag Build
+name: Unified Approval + Tag Build
 
 on:
   workflow_dispatch:
@@ -27,30 +27,33 @@ jobs:
           issue-body: 'Please approve or deny this build'
           exclude-workflow-initiator-as-approver: true
 
-  dispatch_build:
-    runs-on: ubuntu-latest
-    outputs:
-      run_build: ${{ steps.set.outputs.run_build }}
-    needs: [check_approvals]
-    if: |
-      github.event_name == 'workflow_dispatch' && needs.check_approvals.outputs.approved == 'true'
-    steps:
-      - id: set
-        run: echo "run_build=true" >> "$GITHUB_OUTPUT"
-
-  skip_dispatch_build:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    outputs:
-      run_build: true
-    steps:
-      - run: echo "Skipping manual approval for tag push"
-
   build:
-    needs: [dispatch_build, skip_dispatch_build]
-    if: |
-      needs.dispatch_build.outputs.run_build == 'true' || needs.skip_dispatch_build.outputs.run_build == 'true'
+    needs: check_approvals
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Real Build Starts Here
-        run: echo "🚀 Building now (trigger => ${{ github.event_name }})"
+      - name: Decide whether to build
+        id: decision
+        run: |
+          echo "event: ${{ github.event_name }}"
+          echo "ref: ${{ github.ref }}"
+          echo "approved: ${{ needs.check_approvals.outputs.approved }}"
+          
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "Proceeding: tag push"
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ needs.check_approvals.outputs.approved }}" == "true" ]]; then
+            echo "Proceeding: manual approved"
+            echo "proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "Not approved, skipping build"
+            echo "proceed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run build if allowed
+        if: steps.decision.outputs.proceed == 'true'
+        run: echo "🚀 Running build!"
+
+      - name: Skip build message
+        if: steps.decision.outputs.proceed != 'true'
+        run: echo "❌ Build skipped — not approved or unexpected trigger"
