@@ -7,3 +7,5 @@
 //   const result = await getLatestSemverInMajor(tags, 0);
 //   expect(result).toBe("0.6.7");
 // });
+
+// This is the tag test file
