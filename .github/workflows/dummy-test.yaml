@@ -13,7 +13,7 @@ jobs:
 
       # Deliberately using an outdated setup-node action (current is v4)
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
           node-version: '14'
           
