@@ -18,4 +18,4 @@ jobs:
           node-version: '14'
           
       - name: Print a message
-        run: echo "Testing dependabot updates!"
+        run: echo "Testing dependabot updates! And a test commit goes here...!"
