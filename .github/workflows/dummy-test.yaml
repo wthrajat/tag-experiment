@@ -1,0 +1,21 @@
+name: Dummy Test Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      # Deliberately using outdated v2 of the checkout action (current is v4)
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Deliberately using an outdated setup-node action (current is v4)
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          
+      - name: Print a message
+        run: echo "Testing dependabot updates!"
