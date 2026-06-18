@@ -9,7 +9,7 @@ jobs:
     steps:
       # Deliberately using outdated v2 of the checkout action (current is v4)
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Deliberately using an outdated setup-node action (current is v4)
       - name: Setup Node.js
